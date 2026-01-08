@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Echo Test</title>
+</head>
+<body>
+    <h1>WebSocket Echo Test</h1>
+    <div id="messagesArea" style="height: 300px; border: 1px solid #ccc; padding: 10px; overflow-y: auto;"></div>
+    <div>
+        <input type="text" id="messageInput" placeholder="メッセージを入力...">
+        <button id="sendButton">送信</button>
+    </div>
+
+    <script>
+        // HTMLの要素を取得
+        const messagesArea = document.getElementById('messagesArea');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // ランダムなクライアントIDを生成
+        const clientId = Math.floor(Math.random() * 1000);
+
+        // WebSocketサーバーに接続
+        const socket = new WebSocket(`ws://localhost:8080/ws/${clientId}`);
+
+        // WebSocket接続が開いた時の処理
+        socket.onopen = function(event) {
+            addMessage("WebSocketサーバーに接続しました");
+        };
+
+        // サーバーからメッセージを受信した時の処理
+        socket.onmessage = function(event) {
+            addMessage("受信: " + event.data);
+        };
+
+        // WebSocketでエラーが発生した時の処理
+        socket.onerror = function(error) {
+            addMessage("エラーが発生しました");
+        };
+
+        // WebSocket接続が閉じた時の処理
+        socket.onclose = function(event) {
+            addMessage("WebSocket接続が切断されました");
+        };
+
+        // 送信ボタンがクリックされた時の処理
+        sendButton.onclick = function(event) {
+            sendMessage();
+        };
+
+        // メッセージ送信処理
+        function sendMessage() {
+            const message = messageInput.value.trim(); // 入力されたメッセージを取得
+            if (message !== '') { // メッセージが空でなければ
+                socket.send(message); // WebSocketサーバーにメッセージを送信
+                addMessage("送信: " + message); // 画面に送信メッセージを表示
+                messageInput.value = ''; // 入力欄をクリア
+            }
+        }
+
+        // メッセージを画面に追加する関数
+        function addMessage(message) {
+            const messageElement = document.createElement('div'); // 新しいdiv要素を作成
+            messageElement.textContent = message; // div要素にメッセージを設定
+            messagesArea.appendChild(messageElement); // メッセージ表示エリアにdiv要素を追加
+            messagesArea.scrollTop = messagesArea.scrollHeight; // メッセージエリアを最下部までスクロール
+        }
+    </script>
+</body>
+</html>

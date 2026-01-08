@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+uvicorn[standard]
+websockets
+pydantic[email]
+google-genai
+python-dotenv
